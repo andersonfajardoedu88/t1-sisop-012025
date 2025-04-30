@@ -125,13 +125,15 @@ public class Sistema {
     
     public static class PCB {
         int id;
-        int pc; // Program counter
-        int[] tabelaPaginas; // Frames alocados
+        int pc;
+        int[] reg;      
+        int[] tabelaPaginas;
         String nomePrograma;
     
         public PCB(int id, int[] tabelaPaginas, String nomePrograma) {
             this.id = id;
             this.pc = 0;
+            this.reg = new int[10]; // 10 registradores da CPU
             this.tabelaPaginas = tabelaPaginas;
             this.nomePrograma = nomePrograma;
         }
@@ -141,6 +143,7 @@ public class Sistema {
             return "PCB{id=" + id + ", pc=" + pc + ", programa='" + nomePrograma + "'}";
         }
     }
+    
 
     public static class GP {
         GM gm;
@@ -724,6 +727,9 @@ public class Sistema {
         */
 
         // testando agora t1-b. AF.
+        
+        gm.aloca(programa.length, tabelaPaginas);
+
         Scanner sc = new Scanner(System.in);
         GP gp = new GP(gm, progs);
         boolean running = true;
