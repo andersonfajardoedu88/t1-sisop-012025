@@ -109,6 +109,14 @@ public class Sistema {
             int offset = enderecoLogico % tamPg;
             return (tabelaPaginas[pagina] * tamPg) + offset;
         }
+
+        public void exibeFrames(int[] tabelaPaginas, int numPaginas) {
+            System.out.println("Frames alocados:");
+            for (int i = 0; i < numPaginas; i++) {
+                System.out.printf("Página %d -> Frame %d (posições físicas %d a %d)\n",
+                        i, tabelaPaginas[i], tabelaPaginas[i]*tamPg, (tabelaPaginas[i]+1)*tamPg - 1);
+            }
+        }
     }
     
 
@@ -569,6 +577,8 @@ public class Sistema {
         int[] tabelaPaginas = new int[128]; // 1024 palavras, tamPg=8
         Word[] programa = progs.retrieveProgram("fatorialV2");
 
+        
+        // alocando as memórias AF.
         if (gm.aloca(programa.length, tabelaPaginas)) {
             System.out.println("Memória alocada com sucesso:");
             for (int i = 0; i < programa.length; i++) {
@@ -580,7 +590,34 @@ public class Sistema {
             System.out.println("Falha na alocação de memória.");
         }
 
+        int numPaginas = (int)Math.ceil((double)programa.length / gm.tamPg);
+
         
+        // testando alocação de memória AF.
+        if (gm.aloca(programa.length, tabelaPaginas)) {
+            System.out.println("✅ Memória alocada com sucesso!\n");
+            gm.exibeFrames(tabelaPaginas, numPaginas);
+
+            // Carga do programa na memória física usando paginação
+            for (int i = 0; i < programa.length; i++) {
+                int enderecoFisico = gm.traduzEndereco(i, tabelaPaginas);
+                hw.mem.pos[enderecoFisico] = programa[i];
+            }
+
+            System.out.println("\n📌 Programa carregado com paginação.");
+
+            // Exibindo posições carregadas
+            System.out.println("\nMemória Física carregada (dump):");
+            for (int i = 0; i < programa.length; i++) {
+                int enderecoFisico = gm.traduzEndereco(i, tabelaPaginas);
+                System.out.printf("End. Físico [%d]: ", enderecoFisico);
+                so.utils.dump(hw.mem.pos[enderecoFisico]);
+            }
+
+        } else {
+            System.out.println("❌ Falha ao alocar memória.");
+        }
+
         //so.utils.loadAndExec(progs.retrieveProgram("fatorialV2"));
 
 		// so.utils.loadAndExec(progs.retrieveProgram("fatorial"));
