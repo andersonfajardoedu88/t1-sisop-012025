@@ -555,7 +555,7 @@ public class Sistema {
 	public Programs progs;
     public GM gm;
 
-	public Sistema(int tamMem) {
+	public Sistema(int tamMem, int tamPg) {
 		hw = new HW(tamMem);           // memoria do HW tem tamMem palavras
 		so = new SO(hw);
 		hw.cpu.setUtilities(so.utils); // permite cpu fazer dump de memoria ao avancar
