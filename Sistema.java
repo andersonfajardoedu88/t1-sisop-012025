@@ -681,16 +681,16 @@ public class Sistema {
 
         
         // alocando as memórias AF. esse pode comentar para apresentar o trabalho
-        if (gm.aloca(programa.length, tabelaPaginas)) {
-            System.out.println("Memória alocada com sucesso:");
-            for (int i = 0; i < programa.length; i++) {
-                int enderecoFisico = gm.traduzEndereco(i, tabelaPaginas);
-                hw.mem.pos[enderecoFisico] = programa[i]; // carregando programa
-            }
-            System.out.println("Programa carregado em memória física (paginada).");
-        } else {
-            System.out.println("Falha na alocação de memória.");
-        }
+        //if (gm.aloca(programa.length, tabelaPaginas)) {
+        //    System.out.println("Memória alocada com sucesso:");
+        //    for (int i = 0; i < programa.length; i++) {
+        //        int enderecoFisico = gm.traduzEndereco(i, tabelaPaginas);
+        //        hw.mem.pos[enderecoFisico] = programa[i]; // carregando programa
+        //    }
+        //    System.out.println("Programa carregado em memória física (paginada).");
+        //} else {
+        //    System.out.println("Falha na alocação de memória.");
+        //}
 
         int numPaginas = (int)Math.ceil((double)programa.length / gm.tamPg);
 
