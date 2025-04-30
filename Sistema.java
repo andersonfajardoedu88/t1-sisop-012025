@@ -553,17 +553,35 @@ public class Sistema {
 	public HW hw;
 	public SO so;
 	public Programs progs;
+    public GM gm;
 
 	public Sistema(int tamMem) {
 		hw = new HW(tamMem);           // memoria do HW tem tamMem palavras
 		so = new SO(hw);
 		hw.cpu.setUtilities(so.utils); // permite cpu fazer dump de memoria ao avancar
 		progs = new Programs();
+        gm = new GM(tamMem, tamPg);
+
 	}
 
 	public void run() {
 
-		so.utils.loadAndExec(progs.retrieveProgram("fatorialV2"));
+        int[] tabelaPaginas = new int[128]; // 1024 palavras, tamPg=8
+        Word[] programa = progs.retrieveProgram("fatorialV2");
+
+        if (gm.aloca(programa.length, tabelaPaginas)) {
+            System.out.println("Memória alocada com sucesso:");
+            for (int i = 0; i < programa.length; i++) {
+                int enderecoFisico = gm.traduzEndereco(i, tabelaPaginas);
+                hw.mem.pos[enderecoFisico] = programa[i]; // carregando programa
+            }
+            System.out.println("Programa carregado em memória física (paginada).");
+        } else {
+            System.out.println("Falha na alocação de memória.");
+        }
+
+        
+        //so.utils.loadAndExec(progs.retrieveProgram("fatorialV2"));
 
 		// so.utils.loadAndExec(progs.retrieveProgram("fatorial"));
 		// fibonacci10,
