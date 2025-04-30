@@ -141,6 +141,85 @@ public class Sistema {
             return "PCB{id=" + id + ", pc=" + pc + ", programa='" + nomePrograma + "'}";
         }
     }
+
+    class GP {
+        GM gm;
+        Programs progs;
+        Map<Integer, PCB> processos;
+        Queue<PCB> filaProntos;
+        int nextId;
+    
+        public GP(GM gm, Programs progs) {
+            this.gm = gm;
+            this.progs = progs;
+            processos = new HashMap<>();
+            filaProntos = new LinkedList<>();
+            nextId = 1;
+        }
+    
+        // Criar processo
+        public boolean criaProcesso(String nomePrograma) {
+            Word[] prog = progs.retrieveProgram(nomePrograma);
+            if (prog == null) {
+                System.out.println("Programa não encontrado.");
+                return false;
+            }
+            
+            int tamPg = gm.tamPg;
+            int numPaginas = (int) Math.ceil((double) prog.length / tamPg);
+            int[] tabelaPaginas = new int[numPaginas];
+    
+            if (!gm.aloca(prog.length, tabelaPaginas)) {
+                System.out.println("Falha ao alocar memória para o processo.");
+                return false;
+            }
+    
+            PCB pcb = new PCB(nextId++, tabelaPaginas, nomePrograma);
+            processos.put(pcb.id, pcb);
+            filaProntos.add(pcb);
+    
+            System.out.println("Processo criado com sucesso! ID: " + pcb.id);
+            return true;
+        }
+    
+        // Desaloca processo
+        public void desalocaProcesso(int id) {
+            PCB pcb = processos.remove(id);
+            if (pcb != null) {
+                gm.desaloca(pcb.tabelaPaginas);
+                filaProntos.remove(pcb);
+                System.out.println("Processo " + id + " desalocado.");
+            } else {
+                System.out.println("Processo não encontrado.");
+            }
+        }
+    
+        // Lista processos existentes
+        public void listaProcessos() {
+            System.out.println("Processos no sistema:");
+            for (PCB pcb : processos.values())
+                System.out.println(pcb);
+        }
+    
+        // Executa um processo específico (apenas inicializa a execução)
+        public void executaProcesso(int id, HW hw) {
+            PCB pcb = processos.get(id);
+            if (pcb == null) {
+                System.out.println("Processo não encontrado.");
+                return;
+            }
+    
+            Word[] prog = progs.retrieveProgram(pcb.nomePrograma);
+            for (int i = 0; i < prog.length; i++) {
+                int enderecoFisico = gm.traduzEndereco(i, pcb.tabelaPaginas);
+                hw.mem.pos[enderecoFisico] = prog[i];
+            }
+    
+            hw.cpu.setContext(pcb.pc);
+            hw.cpu.run();  // executa processo até STOP
+            System.out.println("Processo " + id + " executado.");
+        }
+    }
     
 
 	// -------------------------------------------------------------------------------------------------------
