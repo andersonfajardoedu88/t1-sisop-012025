@@ -693,8 +693,10 @@ public class Sistema {
         //}
 
         int numPaginas = (int)Math.ceil((double)programa.length / gm.tamPg);
-
+        
+        /* DESABILITE ESTE COMENTÁRIO PARA TESTAR T1A
         // testando alocação de memória AF.
+        //  
         if (gm.aloca(programa.length, tabelaPaginas)) {
             System.out.println("✅ Memória alocada com sucesso!\n");
             gm.exibeFrames(tabelaPaginas, numPaginas);
@@ -718,6 +720,8 @@ public class Sistema {
         } else {
             System.out.println("❌ Falha ao alocar memória.");
         }
+
+        */
 
         // testando agora t1-b. AF.
         Scanner sc = new Scanner(System.in);
