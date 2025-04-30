@@ -770,7 +770,7 @@ public class Sistema {
 
 		public Word[] retrieveProgram(String pname) {
 			for (Program p : progs) {
-				if (p != null & p.name == pname)
+				if (p != null && p.name.equals(pname))
 					return p.image;
 			}
 			return null;
