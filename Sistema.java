@@ -641,103 +641,61 @@ public class Sistema {
 	}
 
 	public void run() {
-
-        int[] tabelaPaginas = new int[128]; // 1024 palavras, tamPg=8
-        Word[] programa = progs.retrieveProgram("fatorialV2");
-
-        
-        // alocando as memórias AF. esse pode comentar para apresentar o trabalho
-        //if (gm.aloca(programa.length, tabelaPaginas)) {
-        //    System.out.println("Memória alocada com sucesso:");
-        //    for (int i = 0; i < programa.length; i++) {
-        //        int enderecoFisico = gm.traduzEndereco(i, tabelaPaginas);
-        //        hw.mem.pos[enderecoFisico] = programa[i]; // carregando programa
-        //    }
-        //    System.out.println("Programa carregado em memória física (paginada).");
-        //} else {
-        //    System.out.println("Falha na alocação de memória.");
-        //}
-
-        //int numPaginas = (int)Math.ceil((double)programa.length / gm.tamPg);
-        
-        /* DESABILITE ESTE COMENTÁRIO PARA TESTAR T1A
-        // testando alocação de memória AF.
-        //  
-        if (gm.aloca(programa.length, tabelaPaginas)) {
-            System.out.println("✅ Memória alocada com sucesso!\n");
-            gm.exibeFrames(tabelaPaginas, numPaginas);
-
-            // Carga do programa na memória física usando paginação
-            for (int i = 0; i < programa.length; i++) {
-                int enderecoFisico = gm.traduzEndereco(i, tabelaPaginas);
-                hw.mem.pos[enderecoFisico] = programa[i];
-            }
-
-            System.out.println("\n📌 Programa carregado com paginação.");
-
-            // Exibindo posições carregadas
-            System.out.println("\nMemória Física carregada (dump):");
-            for (int i = 0; i < programa.length; i++) {
-                int enderecoFisico = gm.traduzEndereco(i, tabelaPaginas);
-                System.out.printf("End. Físico [%d]: ", enderecoFisico);
-                so.utils.dump(hw.mem.pos[enderecoFisico]);
-            }
-
-        } else {
-            System.out.println("❌ Falha ao alocar memória.");
-        }
-
-        */
-
-        // testando agora t1-b. AF.
-        
-        //gm.aloca(programa.length, tabelaPaginas);
-
         Scanner sc = new Scanner(System.in);
         GP gp = new GP(gm, progs);
+        Escalonador escalonador = new Escalonador(gp, hw);
         boolean running = true;
+    
+        // Inicia o escalonador contínuo (T1-C)
+        escalonador.start();
+    
+        System.out.println("🖥️ Sistema Operacional Simulado (T1-A + T1-B + T1-C)");
+        System.out.println("Comandos disponíveis: new <programa>, rm <id>, ps, execAll, exit");
     
         while (running) {
             System.out.print("\n> ");
             String cmd = sc.nextLine();
             String[] parts = cmd.split(" ");
+    
             switch (parts[0]) {
+    
                 case "new":
                     if (parts.length > 1)
                         gp.criaProcesso(parts[1]);
                     else
-                        System.out.println("Uso: new <programa>");
+                        System.out.println("Uso correto: new <nomePrograma>");
                     break;
+    
                 case "rm":
-                    gp.desalocaProcesso(Integer.parseInt(parts[1]));
+                    if (parts.length > 1)
+                        gp.desalocaProcesso(Integer.parseInt(parts[1]));
+                    else
+                        System.out.println("Uso correto: rm <id>");
                     break;
+    
                 case "ps":
                     gp.listaProcessos();
                     break;
-                case "exec":
-                    gp.executaProcesso(Integer.parseInt(parts[1]), hw);
+    
+                case "execAll":
+                    System.out.println("🚦 O escalonador já está em execução automática.");
                     break;
+    
                 case "exit":
                     running = false;
+                    escalonador.running = false;  // Finaliza o escalonador
+                    System.out.println("⛔️ Finalizando o sistema operacional simulado...");
                     break;
+    
                 default:
-                    System.out.println("Comandos: new, rm, ps, exec, exit");
+                    System.out.println("⚠️ Comando inválido.");
+                    System.out.println("Comandos válidos: new <programa>, rm <id>, ps, execAll, exit");
                     break;
             }
         }
         sc.close();
-
-        //so.utils.loadAndExec(progs.retrieveProgram("fatorialV2"));
-
-		// so.utils.loadAndExec(progs.retrieveProgram("fatorial"));
-		// fibonacci10,
-		// fibonacci10v2,
-		// progMinimo,
-		// fatorialWRITE, // saida
-		// fibonacciREAD, // entrada
-		// PB
-		// PC, // bubble sort
-	}
+    }
+    
 	// ------------------- S I S T E M A - fim
 	// --------------------------------------------------------------
 	// -------------------------------------------------------------------------------------------------------
