@@ -58,6 +58,60 @@ public class Sistema {
 		}
 	}
 
+    	// -------------------------------------------------------------------------------------------------------
+	// --------------------- GERENCIA DE MEMORIA 
+	// -----------------------------------------------------
+
+    class GM {
+        private int tamMem;
+        private int tamPg;
+        private int numFrames;
+        private boolean[] frames;
+    
+        public GM(int tamMem, int tamPg) {
+            this.tamMem = tamMem;
+            this.tamPg = tamPg;
+            this.numFrames = tamMem / tamPg;
+            this.frames = new boolean[numFrames]; // Todos inicialmente livres
+        }
+    
+        // Retorna true se conseguiu alocar, e popula tabelaPaginas com frames alocados
+        public boolean aloca(int nroPalavras, int[] tabelaPaginas) {
+            int numPaginas = (int)Math.ceil((double)nroPalavras / tamPg);
+            int paginasAlocadas = 0;
+    
+            for (int i = 0; i < numFrames && paginasAlocadas < numPaginas; i++) {
+                if (!frames[i]) {
+                    frames[i] = true; // Marca como ocupado
+                    tabelaPaginas[paginasAlocadas] = i; // guarda o índice do frame
+                    paginasAlocadas++;
+                }
+            }
+    
+            if (paginasAlocadas < numPaginas) { // Se não conseguiu alocar tudo, desaloca o que já foi alocado
+                for (int i = 0; i < paginasAlocadas; i++)
+                    frames[tabelaPaginas[i]] = false;
+                return false;
+            }
+            return true;
+        }
+    
+        // Desaloca os frames associados a um processo
+        public void desaloca(int[] tabelaPaginas) {
+            for (int frame : tabelaPaginas) {
+                frames[frame] = false; // Libera o frame
+            }
+        }
+    
+        // Método para traduzir endereço lógico para físico
+        public int traduzEndereco(int enderecoLogico, int[] tabelaPaginas) {
+            int pagina = enderecoLogico / tamPg;
+            int offset = enderecoLogico % tamPg;
+            return (tabelaPaginas[pagina] * tamPg) + offset;
+        }
+    }
+    
+
 	// -------------------------------------------------------------------------------------------------------
 	// --------------------- C P U - definicoes da CPU
 	// -----------------------------------------------------
