@@ -118,6 +118,29 @@ public class Sistema {
             }
         }
     }
+
+    // -------------------------------------------------------------------------------------------------------
+	// --------------------- GERENCIA DE PROCESSOS
+	// -----------------------------------------------------
+    
+    class PCB {
+        int id;
+        int pc; // Program counter
+        int[] tabelaPaginas; // Frames alocados
+        String nomePrograma;
+    
+        public PCB(int id, int[] tabelaPaginas, String nomePrograma) {
+            this.id = id;
+            this.pc = 0;
+            this.tabelaPaginas = tabelaPaginas;
+            this.nomePrograma = nomePrograma;
+        }
+    
+        @Override
+        public String toString() {
+            return "PCB{id=" + id + ", pc=" + pc + ", programa='" + nomePrograma + "'}";
+        }
+    }
     
 
 	// -------------------------------------------------------------------------------------------------------
