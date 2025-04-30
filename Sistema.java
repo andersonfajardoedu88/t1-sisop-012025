@@ -578,7 +578,7 @@ public class Sistema {
         Word[] programa = progs.retrieveProgram("fatorialV2");
 
         
-        // alocando as memórias AF.
+        // alocando as memórias AF. esse pode comentar para apresentar o trabalho
         if (gm.aloca(programa.length, tabelaPaginas)) {
             System.out.println("Memória alocada com sucesso:");
             for (int i = 0; i < programa.length; i++) {
@@ -592,7 +592,6 @@ public class Sistema {
 
         int numPaginas = (int)Math.ceil((double)programa.length / gm.tamPg);
 
-        
         // testando alocação de memória AF.
         if (gm.aloca(programa.length, tabelaPaginas)) {
             System.out.println("✅ Memória alocada com sucesso!\n");
