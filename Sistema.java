@@ -62,7 +62,7 @@ public class Sistema {
 	// --------------------- GERENCIA DE MEMORIA 
 	// -----------------------------------------------------
 
-    class GM {
+    public class GM {
         private int tamMem;
         private int tamPg;
         private int numFrames;
@@ -123,7 +123,7 @@ public class Sistema {
 	// --------------------- GERENCIA DE PROCESSOS
 	// -----------------------------------------------------
     
-    class PCB {
+    public static class PCB {
         int id;
         int pc; // Program counter
         int[] tabelaPaginas; // Frames alocados
@@ -142,7 +142,7 @@ public class Sistema {
         }
     }
 
-    class GP {
+    public static class GP {
         GM gm;
         Programs progs;
         Map<Integer, PCB> processos;
