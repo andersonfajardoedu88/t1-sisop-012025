@@ -232,7 +232,7 @@ public class Sistema {
         GP gp;
         HW hw;
         boolean running = true;
-        int fatiaTempo = 5;  // cada processo executa 5 instruções por ciclo
+        int fatiaTempo = 5; // Número de instruções por fatia (ciclo Round-Robin)
     
         public Escalonador(GP gp, HW hw) {
             this.gp = gp;
@@ -242,26 +242,33 @@ public class Sistema {
         public void run() {
             while (running) {
                 PCB pcb = gp.filaProntos.poll();
+    
                 if (pcb != null) {
-                    System.out.println("\nEscalonando processo ID: " + pcb.id);
+                    System.out.println("\n🔵 Escalonando processo ID: " + pcb.id + " | Programa: " + pcb.nomePrograma);
                     hw.cpu.restauraContexto(pcb);
                     int instrucoesExecutadas = 0;
     
+                    // Executa exatamente uma fatia de tempo (5 instruções ou até o fim do processo)
                     while (instrucoesExecutadas < fatiaTempo && !hw.cpu.cpuStop) {
-                        hw.cpu.run(); // executa 1 instrução por vez (adapte CPU para isso)
+                        hw.cpu.run();
                         instrucoesExecutadas++;
                     }
     
-                    if (!hw.cpu.cpuStop) { // Se processo não terminou
+                    // Se o processo não terminou, salva e retorna à fila
+                    if (!hw.cpu.cpuStop) {
                         hw.cpu.salvaContexto(pcb);
-                        gp.filaProntos.offer(pcb); // recoloca no fim da fila
-                    } else { // processo terminou
+                        gp.filaProntos.offer(pcb);
+                        System.out.println("🟡 Processo ID " + pcb.id + " salvo e retornado à fila.");
+                    } else {
+                        // Processo terminado e desalocado
                         gp.desalocaProcesso(pcb.id);
-                        hw.cpu.cpuStop = false; // reset flag cpuStop
+                        hw.cpu.cpuStop = false; // Reset cpuStop para o próximo processo
+                        System.out.println("✅ Processo ID " + pcb.id + " finalizado e removido do sistema.");
                     }
                 }
     
-                try { Thread.sleep(100); } catch (InterruptedException e) {}
+                // Pequena pausa para clareza visual no console
+                try { Thread.sleep(500); } catch (InterruptedException e) {}
             }
         }
     }
