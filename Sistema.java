@@ -347,6 +347,7 @@ public class Sistema {
         public void restauraContexto(PCB pcb) {
             pc = pcb.pc;
             reg = pcb.reg.clone();
+            cpuStop = false;
         }
 
 		private boolean testOverflow(int v) {             // toda operacao matematica deve avaliar se ocorre overflow
@@ -690,7 +691,7 @@ public class Sistema {
 
         // testando agora t1-b. AF.
         
-        gm.aloca(programa.length, tabelaPaginas);
+        //gm.aloca(programa.length, tabelaPaginas);
 
         Scanner sc = new Scanner(System.in);
         GP gp = new GP(gm, progs);
