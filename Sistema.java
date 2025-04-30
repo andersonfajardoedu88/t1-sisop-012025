@@ -232,7 +232,7 @@ public class Sistema {
         GP gp;
         HW hw;
         boolean running = true;
-        int fatiaTempo = 5; // Número de instruções por fatia (ciclo Round-Robin)
+        int fatiaTempo = 5;
     
         public Escalonador(GP gp, HW hw) {
             this.gp = gp;
@@ -244,30 +244,29 @@ public class Sistema {
                 PCB pcb = gp.filaProntos.poll();
     
                 if (pcb != null) {
-                    System.out.println("\n🔵 Escalonando processo ID: " + pcb.id + " | Programa: " + pcb.nomePrograma);
+                    System.out.println("\n🔵 Escalonando ID: " + pcb.id + " | " + pcb.nomePrograma);
                     hw.cpu.restauraContexto(pcb);
                     int instrucoesExecutadas = 0;
     
-                    // Executa exatamente uma fatia de tempo (5 instruções ou até o fim do processo)
                     while (instrucoesExecutadas < fatiaTempo && !hw.cpu.cpuStop) {
                         hw.cpu.run();
                         instrucoesExecutadas++;
+                        
+                        // Pausa visual para demonstração (Teste 3)
+                        try { Thread.sleep(100); } catch (InterruptedException e) {}
                     }
     
-                    // Se o processo não terminou, salva e retorna à fila
                     if (!hw.cpu.cpuStop) {
                         hw.cpu.salvaContexto(pcb);
                         gp.filaProntos.offer(pcb);
                         System.out.println("🟡 Processo ID " + pcb.id + " salvo e retornado à fila.");
                     } else {
-                        // Processo terminado e desalocado
-                        gp.desalocaProcesso(pcb.id);
-                        hw.cpu.cpuStop = false; // Reset cpuStop para o próximo processo
-                        System.out.println("✅ Processo ID " + pcb.id + " finalizado e removido do sistema.");
+                        System.out.println("✅ Processo ID " + pcb.id + " finalizado. Memória não limpa (Teste 2).");
+                        gp.processos.remove(pcb.id);
+                        hw.cpu.cpuStop = false; // reset para próximos processos
                     }
                 }
     
-                // Pequena pausa para clareza visual no console
                 try { Thread.sleep(500); } catch (InterruptedException e) {}
             }
         }
@@ -647,17 +646,22 @@ public class Sistema {
 
 	}
 
-	public void run() {
+    public void run() {
         Scanner sc = new Scanner(System.in);
         GP gp = new GP(gm, progs);
         Escalonador escalonador = new Escalonador(gp, hw);
+        
+        // Pré-alocação de quadros ocupados (Teste 1)
+        gm.frames[1] = true;
+        gm.frames[3] = true;
+        gm.frames[5] = true;
+        System.out.println("🟠 Quadros 1, 3, 5 foram pré-alocados como ocupados (Teste 1).");
+    
+        escalonador.start(); // Inicia escalonamento contínuo (Teste 3.2)
+    
         boolean running = true;
-    
-        // Inicia o escalonador contínuo (T1-C)
-        escalonador.start();
-    
-        System.out.println("🖥️ Sistema Operacional Simulado (T1-A + T1-B + T1-C)");
-        System.out.println("Comandos disponíveis: new <programa>, rm <id>, ps, execAll, exit");
+        System.out.println("\n🖥️ Sistema Operacional (Testes GM, GP e Escalonamento)");
+        System.out.println("Comandos: new <prog>, rm <id>, ps, dump <id>, execAll, exit");
     
         while (running) {
             System.out.print("\n> ");
@@ -667,36 +671,56 @@ public class Sistema {
             switch (parts[0]) {
     
                 case "new":
-                    if (parts.length > 1)
+                    if (parts.length > 1) {
                         gp.criaProcesso(parts[1]);
-                    else
+                    } else {
                         System.out.println("Uso correto: new <nomePrograma>");
+                    }
                     break;
     
                 case "rm":
-                    if (parts.length > 1)
+                    if (parts.length > 1) {
                         gp.desalocaProcesso(Integer.parseInt(parts[1]));
-                    else
+                    } else {
                         System.out.println("Uso correto: rm <id>");
+                    }
                     break;
     
                 case "ps":
                     gp.listaProcessos();
                     break;
     
+                case "dump":
+                    if (parts.length > 1) {
+                        int pid = Integer.parseInt(parts[1]);
+                        PCB pcb = gp.processos.get(pid);
+                        if (pcb != null) {
+                            System.out.println("🔎 Dump da memória do processo ID: " + pid);
+                            for (int i = 0; i < pcb.tabelaPaginas.length * gm.tamPg; i++) {
+                                int fisico = gm.traduzEndereco(i, pcb.tabelaPaginas);
+                                System.out.print("Físico [" + fisico + "] -> ");
+                                so.utils.dump(hw.mem.pos[fisico]);
+                            }
+                        } else {
+                            System.out.println("Processo não encontrado.");
+                        }
+                    } else {
+                        System.out.println("Uso correto: dump <id>");
+                    }
+                    break;
+    
                 case "execAll":
-                    System.out.println("🚦 O escalonador já está em execução automática.");
+                    System.out.println("🚦 Escalonamento contínuo já está rodando automaticamente.");
                     break;
     
                 case "exit":
                     running = false;
-                    escalonador.running = false;  // Finaliza o escalonador
-                    System.out.println("⛔️ Finalizando o sistema operacional simulado...");
+                    escalonador.running = false;
+                    System.out.println("⛔️ Finalizando sistema...");
                     break;
     
                 default:
-                    System.out.println("⚠️ Comando inválido.");
-                    System.out.println("Comandos válidos: new <programa>, rm <id>, ps, execAll, exit");
+                    System.out.println("⚠️ Comando inválido. Opções: new <prog>, rm <id>, ps, dump <id>, execAll, exit");
                     break;
             }
         }
