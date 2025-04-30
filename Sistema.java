@@ -692,7 +692,7 @@ public class Sistema {
         //    System.out.println("Falha na alocação de memória.");
         //}
 
-        int numPaginas = (int)Math.ceil((double)programa.length / gm.tamPg);
+        //int numPaginas = (int)Math.ceil((double)programa.length / gm.tamPg);
         
         /* DESABILITE ESTE COMENTÁRIO PARA TESTAR T1A
         // testando alocação de memória AF.
