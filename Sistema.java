@@ -298,6 +298,16 @@ public class Sistema {
 			}
 		}
 
+        public void salvaContexto(PCB pcb) {
+            pcb.pc = pc;
+            pcb.reg = reg.clone();
+        }
+        
+        public void restauraContexto(PCB pcb) {
+            pc = pcb.pc;
+            reg = pcb.reg.clone();
+        }
+
 		private boolean testOverflow(int v) {             // toda operacao matematica deve avaliar se ocorre overflow
 			if ((v < minInt) || (v > maxInt)) {
 				irpt = Interrupts.intOverflow;            // se houver liga interrupcao no meio da exec da instrucao
