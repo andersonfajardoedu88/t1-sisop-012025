@@ -719,6 +719,41 @@ public class Sistema {
             System.out.println("❌ Falha ao alocar memória.");
         }
 
+        // testando agora t1-b. AF.
+        Scanner sc = new Scanner(System.in);
+        GP gp = new GP(gm, progs);
+        boolean running = true;
+    
+        while (running) {
+            System.out.print("\n> ");
+            String cmd = sc.nextLine();
+            String[] parts = cmd.split(" ");
+            switch (parts[0]) {
+                case "new":
+                    if (parts.length > 1)
+                        gp.criaProcesso(parts[1]);
+                    else
+                        System.out.println("Uso: new <programa>");
+                    break;
+                case "rm":
+                    gp.desalocaProcesso(Integer.parseInt(parts[1]));
+                    break;
+                case "ps":
+                    gp.listaProcessos();
+                    break;
+                case "exec":
+                    gp.executaProcesso(Integer.parseInt(parts[1]), hw);
+                    break;
+                case "exit":
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Comandos: new, rm, ps, exec, exit");
+                    break;
+            }
+        }
+        sc.close();
+
         //so.utils.loadAndExec(progs.retrieveProgram("fatorialV2"));
 
 		// so.utils.loadAndExec(progs.retrieveProgram("fatorial"));
